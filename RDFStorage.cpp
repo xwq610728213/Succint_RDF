@@ -21,7 +21,8 @@ RDFStorage::RDFStorage(ifstream& abox_file, TripleStoreType ts_type){
 
 void RDFStorage::load_facts(ifstream& abox_file, TripleStoreType ts_type) {
 
-    //dict_properties.add("<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>", 0);
+    //to comment while using rdftype store
+    dict_properties.add("<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>", 0);
 
     ID_TYPE last_instance_id = 0;
     ID_TYPE last_property_id = 0;
@@ -34,14 +35,14 @@ void RDFStorage::load_facts(ifstream& abox_file, TripleStoreType ts_type) {
     string str;
     vector<RankBaseElement<3>> triple_vector;
 
-    // For each fact, if instance doesn't exist, ditribute an id_instance
+    // For each fact, if instance doesn't exist, distribute an id_instance
     //                if concept doesn't exist, remind to check the TBOX
-    //                if property doesn't exist, ditribute an id_property
+    //                if property doesn't exist, distribute an id_property
     auto start = clock();
     while(getline(abox_file, str, '\n')){
-        stringstream input(str);
+        //stringstream input(str);
         string subject, predicate, object;
-        input >> subject >> predicate >> object;
+        tie(subject, predicate, object) = triple_string_parser(str);
         ID_TYPE id_s, id_p, id_o;
 
         // Update dictionary, search id_s
@@ -69,7 +70,7 @@ void RDFStorage::load_facts(ifstream& abox_file, TripleStoreType ts_type) {
         if(true /*predicate != RDF_TYPE*/){
             try {
                 id_o = dict_instances.look_up_instance(object);
-            }catch(DictException& excep){
+            }catch(DictException &excep){
                 ++last_instance_id;
                 dict_instances.add(object, last_instance_id);
                 id_o = last_instance_id;
@@ -104,7 +105,7 @@ void RDFStorage::load_facts(ifstream& abox_file, TripleStoreType ts_type) {
                     char answer;
                     cin >> answer;
                     while(answer != 'Y' && answer != 'N' && answer != 'y' && answer != 'n'){
-                        cout << "Please type Y/N!" << endl;
+                        cout << "Please enter Y/N!" << endl;
                         cin >> answer;
                     }
                     if(answer == 'Y' || answer == 'y'){
@@ -621,9 +622,9 @@ bool RDFStorage::merge_join_condition(const vector<string> &variables, const vec
 tuple<vector<string>, vector<vector<ID_TYPE>>> RDFStorage::query_graph_pattern(vector<string> triple_string_vector) {
     vector<vector<string>> query_table;
     for(string triple_pattern:triple_string_vector){
-        stringstream input(triple_pattern);
+        //stringstream input(triple_pattern);
         string query_subject, query_predicate, query_object;
-        input >> query_subject >> query_predicate >> query_object;
+        tie(query_subject, query_predicate, query_object) = triple_string_parser(triple_pattern);
         vector<string> tmp;
         tmp.push_back(query_subject);
         tmp.push_back(query_predicate);
@@ -796,4 +797,41 @@ void RDFStorage::store_to_disk(const string &path) {
 
 void RDFStorage::back_up_from_disk(const string &path){
     triple_store.back_up_from_disk(path);
+}
+
+tuple<string,string,string> RDFStorage::triple_string_parser(string &str) {
+    unsigned long index_begin = 0, triple_index = 0;
+    string triple[3];
+    char last_sym = '0';
+    for(unsigned long i = 0; i < str.size(); ++i){
+        if((str[i] >= 'a' && str[i] <= 'z') || (str[i] >= 'A' && str[i] <= 'Z')){
+            continue;
+        }else if(str[i] == '?' && last_sym == '0'){
+            index_begin = i;
+            last_sym = '?';
+        }else if(str[i] == '<' && last_sym == '0'){
+            index_begin = i;
+            last_sym = '<';
+        }else if(str[i] == '\"' && last_sym != '\"'){
+            index_begin = i;
+            last_sym = '\"';
+        }else if(last_sym != '0' && str[i] >= '0' && str[i] <= '9'){
+            index_begin = i;
+            last_sym = '1';
+        }else if(str[i] == '>' && last_sym == '<'){
+            triple[triple_index] = str.substr(index_begin, i - index_begin + 1);
+            ++triple_index;
+            last_sym = '0';
+        }else if(str[i] == '\"' && last_sym == '\"'){
+            // in case of "qs dfza"^^xsd:string
+            last_sym = 'e';
+        }else if(str[i] == ' ' && (last_sym == 'e' || last_sym == '?' || last_sym == '1')){
+            triple[triple_index] = str.substr(index_begin, i - index_begin);
+            ++triple_index;
+            last_sym = '0';
+        }
+        if(triple_index >=3)
+            break;
+    }
+    return make_tuple(triple[0], triple[1], triple[2]);
 }

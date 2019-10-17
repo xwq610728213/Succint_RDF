@@ -1,4 +1,4 @@
-# Install script for directory: /Users/xu/Documents/Doctorat/git_workplace/triple_store_optjoin_merge_bitmap
+# Install script for directory: /Users/xu/Documents/Doctorat/git_workplace/triple_store_datatype
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -40,5 +40,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/Users/xu/Documents/Doctorat/git_workplace/triple_store_optjoin_merge_bitmap/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/Users/xu/Documents/Doctorat/git_workplace/triple_store_datatype/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

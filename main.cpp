@@ -117,15 +117,15 @@ int main(int argc, char* argv[]) {
 
     if(argc != 4){
         cout << "Usage: triple_store data_path query_path storage_path" << endl;
-        exit(1);
+        //exit(1);
     }
 
-    char* data_path = argv[1];
-    //char* data_path = "/Users/xu/Documents/Doctorat/git_workplace/triple_store/test_data/data.nt";
-    char* query_path = argv[2];
-    //char* query_path = "/Users/xu/Documents/Doctorat/git_workplace/triple_store/test_data/query.sparql";
-    char* storage_path = argv[3];
-    //char* storage_path = "/Users/xu/Documents/Doctorat/git_workplace/triple_store/test_data/store";
+    //char* data_path = argv[1];
+    char* data_path = "/Users/xu/Documents/Doctorat/git_workplace/triple_store/test_data/data.nt";
+    //char* query_path = argv[2];
+    char* query_path = "/Users/xu/Documents/Doctorat/git_workplace/triple_store/test_data/query.sparql";
+    //char* storage_path = argv[3];
+    char* storage_path = "/Users/xu/Documents/Doctorat/git_workplace/triple_store/test_data/store";
     clock_t start, end;
 
     ifstream abox_file;

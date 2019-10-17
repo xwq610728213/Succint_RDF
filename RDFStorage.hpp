@@ -24,6 +24,7 @@ private:
     Dictionary dict_properties;   // Can be optimized with LiteMat
     Dictionary dict_concepts;  // Can be optimized with LiteMat
 
+    tuple<string,string,string> triple_string_parser(string &str);
     unsigned long long num_predicate_triples(string predicate);
     bool more_selective(vector<string>& first, vector<string>& second);
     vector<string> find_first_triple_pattern(vector<vector<string>>& query_table);
